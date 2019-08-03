@@ -17,10 +17,13 @@ hosts whose status is unknown in a short amount of time. It's fast, indeed
 halive achieve its speed through its asynchronous design.
 
 Once we have a list of domains/subdomains gathered from the reconnaissance phase,
-(for example through [pdlist](https://github.com/gnebbia/pdlist) we want to check 
+(for example through [pdlist](https://github.com/gnebbia/pdlist)) we want to check 
 fastly which subdomains are alive and which are not.
 To this purpose we can use halive and obtain from the initial list of hostnames
 only the alive subdomains.
+
+![](img/halive_scheme.png)
+
 
 
 ## INSTALLATION
