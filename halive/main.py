@@ -44,7 +44,9 @@ def get_urls(inputfiles):
         urls.append(lines)
     urls = set([n for l in urls for n in l])
     urls = list(filter(None, urls))
-    urls = ["http://"+l for l in urls if not scheme_rgx.match(l)]
+    for i in range(len(urls)):
+        if not scheme_rgx.match(urls[i]):
+            urls[i] = 'http://'+urls[i]
     return urls
 
 
@@ -83,7 +85,7 @@ async def download(urls,num_workers,show_only_success,outputfile,only_urls):
 def make_request(url):
     response = {}
     try:
-        r = requests.get(url)
+        r = requests.head(url,allow_redirects=False)
         response['url'] = r.url
         response['status'] = r.status_code
     except:
