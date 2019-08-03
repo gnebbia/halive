@@ -1,8 +1,0 @@
-http://example.com/,200
-https://github.com/gnebbia/awdawdwdawd,404
-https://github.com/gnebbia/pdlist,200
-https://www.nasa.gov/,200
-https://github.com/gnebbia/lallora,404
-https://www.ciao.it/,200
-http://pelabinfosec.ml/,200
-https://www.cvedetails.com/,200

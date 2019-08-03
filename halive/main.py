@@ -23,7 +23,13 @@ from halive.cl_parser import parse_args
 
 
 def show_banner():
-    print("""(H)ALIVE!
+    print("""
+ _   _    _    _     _____     _______
+| | | |  / \  | |   |_ _\ \   / / ____|
+| |_| | / _ \ | |    | | \ \ / /|  _|
+|  _  |/ ___ \| |___ | |  \ V / | |___
+|_| |_/_/   \_\_____|___|  \_/  |_____|
+
 
 A super fast asynchronous http and https prober, to check who is (h)alive.
 Developed by gnc
@@ -42,7 +48,7 @@ def get_urls(inputfiles):
     return urls
 
 
-async def download(urls,num_workers,show_only_success,outputfile):
+async def download(urls,num_workers,show_only_success,outputfile,only_urls):
     outputfiledata = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=num_workers) as executor:
         loop = asyncio.get_event_loop()
@@ -56,13 +62,22 @@ async def download(urls,num_workers,show_only_success,outputfile):
             if not response['status'] == -1:
                 if show_only_success:
                     if response['status'] < 400 or response['status'] >= 500:
-                        print('{:70.70} {}'.format(response['url'],response['status']))
+                        if only_urls:
+                            print(response['url'])
+                        else:
+                            print('{:70.70} {}'.format(response['url'],response['status']))
                 else:
-                    print('{:70.70} {}'.format(response['url'],response['status']))
+                    if only_urls:
+                        print(response['url'])
+                    else:
+                        print('{:70.70} {}'.format(response['url'],response['status']))
         if outputfile:
             for d in outputfiledata:
                 if not d['status'] == -1:
-                    outputfile.write('{},{}\n'.format(d['url'],d['status']))
+                    if only_urls:
+                        outputfile.write('{}\n'.format(d['url']))
+                    else:
+                        outputfile.write('{},{}\n'.format(d['url'],d['status']))
 
 
 def make_request(url, timeout=3):
@@ -84,8 +99,16 @@ def main():
     show_banner()
     args = parse_args(sys.argv[1:])
     urls = get_urls(args.inputfiles)
-    print('{:70.70} {}'.format("URL","Response"))
+    if args.only_urls:
+        print("URL")
+    else:
+        print('{:70.70} {}'.format("URL","Response"))
+
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(download(urls,args.concurrency,args.onlysuccess,args.outputfile))
+    loop.run_until_complete(download(urls,\
+                                    args.concurrency,\
+                                    args.only_success,\
+                                    args.outputfile,\
+                                    args.only_urls))
 
 

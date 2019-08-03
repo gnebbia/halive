@@ -36,33 +36,33 @@ def parse_args(args):
 
     parser.add_argument(
         "inputfiles",
-        help="Input file with one url per line",
+        help="input file with one url per line",
         type=argparse.FileType('r'),
         nargs='+',
         )
     parser.add_argument(
         "-o","--output",
         dest='outputfile',
-        help="Save results to the specified file",
+        help="save results to the specified file",
         default=None,
         nargs='?',
         type=argparse.FileType('w'),
         )
     parser.add_argument(
         "-t","--concurrency",
-        help="Number of concurrent http requests",
+        help="number of concurrent http requests",
         default=20,
         type=int,
         )
     parser.add_argument(
-        "-s","--onlysuccess",
-        help="Show only responses which are not 4XX errors",
+        "-s","--only-success",
+        help="show only responses which are not 4XX errors",
         action='store_true',
         default=False,
         )
     parser.add_argument(
-        "-r","--redirect",
-        help="Enables redirect following",
+        "-u","--only-urls",
+        help="show only active URLs, without response status codes",
         action='store_true',
         default=False,
         )
