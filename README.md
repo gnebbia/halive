@@ -1,9 +1,12 @@
 # halive.  An http/s prober, to check which URLs are alive.
 
-Info: This is the README file for halive.
-Author: gnc <nebbionegiuseppe@gmail.com>
+
+Author: gnc
+
 Copyright: © 2019, gnc.
+
 Date: 2019-08-03
+
 Version: 0.1.0
 
 
