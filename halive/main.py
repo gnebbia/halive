@@ -80,7 +80,7 @@ async def download(urls,num_workers,show_only_success,outputfile,only_urls):
                         outputfile.write('{},{}\n'.format(d['url'],d['status']))
 
 
-def make_request(url, timeout=3):
+def make_request(url):
     response = {}
     try:
         r = requests.get(url)
