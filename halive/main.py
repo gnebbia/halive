@@ -5,7 +5,7 @@
 # See /LICENSE for licensing information.
 
 """
-INSERT MODULE DESCRIPTION HERE.
+Main module for halive.
 
 :Copyright: © 2019, gnc.
 :License: BSD (see /LICENSE).
@@ -21,6 +21,15 @@ import concurrent.futures
 from halive.cl_parser import parse_args
 
 
+
+def show_banner():
+    print("""(H)ALIVE!
+
+A super fast asynchronous http and https prober, to check who is (h)alive.
+Developed by gnc
+    """)
+
+
 def get_urls(inputfiles):
     urls = []
     scheme_rgx = re.compile(r'^https?://')
@@ -33,7 +42,8 @@ def get_urls(inputfiles):
     return urls
 
 
-async def download(urls,num_workers,show_only_success):
+async def download(urls,num_workers,show_only_success,outputfile):
+    outputfiledata = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=num_workers) as executor:
         loop = asyncio.get_event_loop()
         futures = []
@@ -42,12 +52,17 @@ async def download(urls,num_workers,show_only_success):
             futures.append(loop.run_in_executor(executor, make_request,u))
 
         for response in await asyncio.gather(*futures):
+            outputfiledata.append(response)
             if not response['status'] == -1:
                 if show_only_success:
                     if response['status'] < 400 or response['status'] >= 500:
                         print('{:70.70} {}'.format(response['url'],response['status']))
                 else:
                     print('{:70.70} {}'.format(response['url'],response['status']))
+        if outputfile:
+            for d in outputfiledata:
+                if not d['status'] == -1:
+                    outputfile.write('{},{}\n'.format(d['url'],d['status']))
 
 
 def make_request(url, timeout=3):
@@ -66,11 +81,11 @@ def make_request(url, timeout=3):
 
 def main():
     """Main routine of halive."""
-
+    show_banner()
     args = parse_args(sys.argv[1:])
     urls = get_urls(args.inputfiles)
     print('{:70.70} {}'.format("URL","Response"))
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(download(urls,args.concurrency,args.onlysuccess))
+    loop.run_until_complete(download(urls,args.concurrency,args.onlysuccess,args.outputfile))
 
 
