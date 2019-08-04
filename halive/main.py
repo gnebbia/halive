@@ -11,8 +11,6 @@ Main module for halive.
 :License: BSD (see /LICENSE).
 """
 
-__all__ = ()
-
 import re
 import sys
 import asyncio

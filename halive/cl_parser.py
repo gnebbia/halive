@@ -11,8 +11,6 @@ Command Line Parsing Module for halive
 :License: BSD (see /LICENSE).
 """
 
-__all__ = ()
-
 import argparse
 
 
