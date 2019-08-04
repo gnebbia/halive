@@ -1,3 +1,7 @@
+# Reports for some tests
+report_test*.txt
+
+
 *.py[cod]
 __pycache__
 

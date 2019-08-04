@@ -38,8 +38,7 @@ def get_urls(inputfiles):
     urls = []
     scheme_rgx = re.compile(r'^https?://')
     for f in inputfiles:
-        lines = f.read().splitlines() 
-        urls.append(lines)
+        urls.append(f.read().splitlines())
     urls = set([n for l in urls for n in l])
     urls = list(filter(None, urls))
     for i in range(len(urls)):
