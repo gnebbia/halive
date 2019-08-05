@@ -14,13 +14,15 @@ Main module for halive.
 import re
 import sys
 import asyncio
-import requests
 import concurrent.futures
+import requests
 from halive.cl_parser import parse_args
 
 
-
 def show_banner():
+    """
+    Shows the banner of Halive
+    """
     print("""
  _   _    _    _     _____     _______
 | | | |  / \  | |   |_ _\ \   / / ____|
@@ -35,10 +37,21 @@ Developed by gnc
 
 
 def get_urls(inputfiles):
+    """
+    This function takes as input the list of files containing the hostnames
+    and normalizes the format of the hostnames in order to be able to perform
+    valid HTTP/HTTPS requests.
+
+    Args:
+    inputfiles -- list of inputfiles
+
+    Returns:
+    urls       -- list of normalized URLs which can be queries
+    """
     urls = []
     scheme_rgx = re.compile(r'^https?://')
-    for f in inputfiles:
-        urls.append(f.read().splitlines())
+    for ifile in inputfiles:
+        urls.append(ifile.read().splitlines())
     urls = set([n for l in urls for n in l])
     urls = list(filter(None, urls))
     for i in range(len(urls)):
@@ -47,14 +60,29 @@ def get_urls(inputfiles):
     return urls
 
 
-async def download(urls,num_workers,show_only_success,outputfile,only_urls):
+async def download(urls, num_workers, show_only_success, outputfile, only_urls):
+    """
+    This function is responsible for performing the asynchrounous requests to
+    the list of URLs.
+
+    Args:
+    urls              -- list of URLs to query
+    num_workers       -- this is an integer determining the degree of concurrency
+    show_only_success -- this is a boolean indicating if only the success
+                         responses (not 4XX) should be shown 
+    outputfile        -- the name of the output file where we want to save the
+                         list of valid URLs
+    only_urls         -- this is a boolean indicating if we want to ouput only
+                         URLs without any response code
+                         (this happens when it is set to True)
+    """
     outputfiledata = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=num_workers) as executor:
         loop = asyncio.get_event_loop()
         futures = []
         response = []
-        for u in urls:
-            futures.append(loop.run_in_executor(executor, make_request,u))
+        for url in urls:
+            futures.append(loop.run_in_executor(executor, make_request, url))
 
         for response in await asyncio.gather(*futures):
             outputfiledata.append(response)
@@ -64,31 +92,42 @@ async def download(urls,num_workers,show_only_success,outputfile,only_urls):
                         if only_urls:
                             print(response['url'])
                         else:
-                            print('{:70.70} {}'.format(response['url'],response['status']))
+                            print(
+                                '{:70.70} {}'.format(
+                                    response['url'],
+                                    response['status']))
                 else:
                     if only_urls:
                         print(response['url'])
                     else:
-                        print('{:70.70} {}'.format(response['url'],response['status']))
+                        print(
+                            '{:70.70} {}'.format(
+                                response['url'],
+                                response['status']))
         if outputfile:
-            for d in outputfiledata:
-                if not d['status'] == -1:
+            for host in outputfiledata:
+                if not host['status'] == -1:
                     if only_urls:
-                        outputfile.write('{}\n'.format(d['url']))
+                        outputfile.write('{}\n'.format(host['url']))
                     else:
-                        outputfile.write('{},{}\n'.format(d['url'],d['status']))
+                        outputfile.write(
+                            '{},{}\n'.format(
+                                host['url'], host['status']))
 
 
 def make_request(url):
+    """
+    This is an internal utility function which is responsible for performing 
+    te request, it saves the results in a dictionary.
+    """
     response = {}
     try:
-        r = requests.head(url, allow_redirects=False, timeout=1)
-        response['url'] = r.url
-        response['status'] = r.status_code
-    except:
+        resp = requests.head(url, allow_redirects=False, timeout=1)
+        response['url'] = resp.url
+        response['status'] = resp.status_code
+    except BaseException:
         response['url'] = url
         response['status'] = -1
-
 
     return response
 
@@ -101,13 +140,11 @@ def main():
     if args.only_urls:
         print("URL")
     else:
-        print('{:70.70} {}'.format("URL","Response"))
+        print('{:70.70} {}'.format("URL", "Response"))
 
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(download(urls,\
-                                    args.concurrency,\
-                                    args.only_success,\
-                                    args.outputfile,\
-                                    args.only_urls))
-
-
+    loop.run_until_complete(download(urls,
+                                     args.concurrency,
+                                     args.only_success,
+                                     args.outputfile,
+                                     args.only_urls))

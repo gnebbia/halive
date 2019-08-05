@@ -14,8 +14,6 @@ Command Line Parsing Module for halive
 import argparse
 
 
-
-
 def parse_args(args):
     """
     This function parses the arguments which have been passed from the command
@@ -29,41 +27,41 @@ def parse_args(args):
     Returns: a parser with the provided arguments, which can be used in a
             simpler format
     """
-    parser = argparse.ArgumentParser(prog='halive',
-            description='An http/s prober, to check which URLs are alive.')
+    parser = argparse.ArgumentParser(
+        prog='halive',
+        description='An http/s prober, to check which URLs are alive.')
 
     parser.add_argument(
         "inputfiles",
         help="input file with one url per line",
         type=argparse.FileType('r'),
         nargs='+',
-        )
+    )
     parser.add_argument(
-        "-o","--output",
+        "-o", "--output",
         dest='outputfile',
         help="save results to the specified file",
         default=None,
         nargs='?',
         type=argparse.FileType('w'),
-        )
+    )
     parser.add_argument(
-        "-t","--concurrency",
+        "-t", "--concurrency",
         help="number of concurrent http requests",
         default=20,
         type=int,
-        )
+    )
     parser.add_argument(
-        "-s","--only-success",
+        "-s", "--only-success",
         help="show only responses which are not 4XX errors",
         action='store_true',
         default=False,
-        )
+    )
     parser.add_argument(
-        "-u","--only-urls",
+        "-u", "--only-urls",
         help="show only active URLs, without response status codes",
         action='store_true',
         default=False,
-        )
-
+    )
 
     return parser.parse_args(args)
